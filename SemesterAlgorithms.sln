@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemesterAlgorithms", "SemesterAlgorithms\SemesterAlgorithms.csproj", "{A7358C46-7765-4FD6-9022-FB86C27EBABE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A7358C46-7765-4FD6-9022-FB86C27EBABE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7358C46-7765-4FD6-9022-FB86C27EBABE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7358C46-7765-4FD6-9022-FB86C27EBABE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7358C46-7765-4FD6-9022-FB86C27EBABE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
