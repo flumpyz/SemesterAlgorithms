@@ -38,8 +38,11 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="Benchmark.cs" />
         <Compile Include="Edge.cs" />
         <Compile Include="Graph.cs" />
+        <Compile Include="Interpreter.cs" />
+        <Compile Include="Measurer.cs" />
         <Compile Include="Node.cs" />
         <Compile Include="Person.cs" />
         <Compile Include="Program.cs" />
