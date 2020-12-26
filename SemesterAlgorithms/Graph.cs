@@ -74,7 +74,7 @@ namespace SemesterAlgorithms
             }
         }
 
-        public void DeleteEdge(int from, int to) // O(n^3) 
+        public void DeleteEdge(int from, int to) // O(n^2) 
         {
             if (ContainsNode(from) && ContainsNode(to))
             {

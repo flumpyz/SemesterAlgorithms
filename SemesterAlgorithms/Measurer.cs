@@ -34,9 +34,9 @@ namespace SemesterAlgorithms
         {
             var stopwatch = new Stopwatch();
 
-            gr.DeleteNode(nodesCount - 1);
+            gr.DeleteNode(nodesCount + 1);
             stopwatch.Start();
-            gr.DeleteNode(nodesCount);
+            gr.DeleteNode(nodesCount + 2);
             stopwatch.Stop();
 
             return stopwatch.Elapsed.TotalMilliseconds;
