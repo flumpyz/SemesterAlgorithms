@@ -30,14 +30,12 @@ namespace SemesterAlgorithms
         {
             if (ContainsNode(from) && ContainsNode(to))
             {
-                var nodeFrom = _nodes.Find(n => n.Number == from);
-                var nodeTo = _nodes.Find(n => n.Number == to);
-                var edge = new Edge(nodeFrom, nodeTo);
-
                 if (!ContainsEdge(from, to))
                 {
-                    nodeFrom.edges.Add(edge);
-                    nodeTo.edges.Add(edge);
+                    var nodeFrom = _nodes.Find(n => n.Number == from);
+                    var nodeTo = _nodes.Find(n => n.Number == to);
+                    nodeFrom.edges.Add(new Edge(nodeFrom, nodeTo));
+                    nodeTo.edges.Add(new Edge(nodeFrom, nodeTo));
                 }
                 else
                 {
@@ -78,14 +76,12 @@ namespace SemesterAlgorithms
         {
             if (ContainsNode(from) && ContainsNode(to))
             {
-                var nodeFrom = _nodes.Find(n => n.Number == from);
-                var nodeTo = _nodes.Find(n => n.Number == to);
-                var edge = new Edge(nodeFrom, nodeTo);
-
                 if (ContainsEdge(from, to))
                 {
-                    nodeFrom.edges.Remove(edge);
-                    nodeTo.edges.Remove(edge);
+                    var nodeFrom = _nodes.Find(n => n.Number == from);
+                    var nodeTo = _nodes.Find(n => n.Number == to);
+                    nodeFrom.edges.Remove(new Edge(nodeFrom, nodeTo));
+                    nodeTo.edges.Remove(new Edge(nodeFrom, nodeTo));
                 }
                 else
                 {
@@ -152,6 +148,22 @@ namespace SemesterAlgorithms
             return graph;
         }
 
+        public void MakeGraph(List<(int, int)> edges)
+        {
+            foreach (var edge in edges)
+            {
+                if (!ContainsNode(edge.Item1))
+                {
+                    AddNode(edge.Item1);
+                }
+                if (!ContainsNode(edge.Item2))
+                {
+                    AddNode(edge.Item2);
+                }
+                AddEdge(edge.Item1, edge.Item2);
+            }
+        }
+
         public List<(int, int)> FindMaxMeetings()
         {
             var meetings = new List<(int, int)>();
@@ -212,6 +224,51 @@ namespace SemesterAlgorithms
                 }
             }
             return dict;
+        }
+
+        public List<(int, int)> FindMaxMeetingsByBruteForce()
+        {
+            var allPaths = BruteForce(FindMutualEdges());
+            
+            return FindBestSequence(allPaths); 
+        }
+
+        private List<List<(int, int)>> BruteForce(List<(int, int)> edges)
+        {
+            var all = new List<List<(int, int)>>();
+            var count = Math.Pow(2, edges.Count);
+            for (var i = 1; i < count; i++)
+            {
+                var str = Convert.ToString(i, 2).PadLeft(edges.Count, '0');
+                var sequence = new List<(int, int)>();
+                var nodes = new HashSet<int>();
+                for (var j = 0; j < str.Length; j++)
+                {
+                    if (str[j] == '1' && !nodes.Contains(edges[j].Item1) && !nodes.Contains(edges[j].Item2))
+                    {
+                        sequence.Add(edges[j]);
+                        nodes.Add(edges[j].Item1);
+                        nodes.Add(edges[j].Item2);
+                    }
+                }
+                all.Add(sequence);
+            }
+            return all;
+        }
+
+        private List<(int, int)> FindBestSequence(List<List<(int, int)>> allOptions)
+        {
+            var max = 0;
+            var bestOption = new List<(int, int)>();
+            foreach (var option in allOptions)
+            {
+                if (option.Count > max)
+                {
+                    max = option.Count;
+                    bestOption = option;
+                }
+            }
+            return bestOption;
         }
     }
 }
