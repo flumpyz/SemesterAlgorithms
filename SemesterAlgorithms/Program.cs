@@ -27,6 +27,7 @@ namespace SemesterAlgorithms
                 (1, 4),
                 (4, 1),
                 (6, 4),
+                (6, 4),
                 (4, 5),
                 (5, 6),
                 (6, 5)

@@ -8,13 +8,15 @@ namespace SemesterAlgorithms
     public class Graph
     {
         private readonly List<Node> _nodes;
+        private readonly HashSet<Node> _infNodes;
 
         public Graph()
         {
             _nodes = new List<Node>();
+            _infNodes = new HashSet<Node>();
         }
 
-        public void AddNode(int nodeNumber) // O(n)
+        public void AddNode(int nodeNumber) // O(1)
         {
             if (ContainsNode(nodeNumber))
             {
@@ -23,17 +25,18 @@ namespace SemesterAlgorithms
             else
             {
                 _nodes.Add(new Node(nodeNumber));
+                _infNodes.Add(new Node(nodeNumber));
             }
         }
 
-        public void AddEdge(int from, int to) // O(n + m)
+        public void AddEdge(int from, int to) 
         {
             if (ContainsNode(from) && ContainsNode(to))
             {
                 if (!ContainsEdge(from, to))
                 {
-                    var nodeFrom = _nodes.Find(n => n.Number == from);
-                    var nodeTo = _nodes.Find(n => n.Number == to);
+                    var nodeFrom = _nodes.Find(n => n.Number == from); 
+                    var nodeTo = _nodes.Find(n => n.Number == to); 
                     nodeFrom.edges.Add(new Edge(nodeFrom, nodeTo));
                     nodeTo.edges.Add(new Edge(nodeFrom, nodeTo));
                 }
@@ -48,23 +51,24 @@ namespace SemesterAlgorithms
             }
         }
 
-        public void DeleteNode(int nodeNumber) // O(n^3)
+        public void DeleteNode(int nodeNumber) 
         {
-            if (ContainsNode(nodeNumber))
+            if (ContainsNode(nodeNumber)) 
             {
-                var node = _nodes.Find(n => n.Number == nodeNumber);
-                foreach (var edge in node.edges)
+                var node = _nodes.Find(n => n.Number == nodeNumber); 
+                foreach (var edge in node.edges) 
                 {
                     if (node.Equals(edge.From))
                     {
-                        edge.To.edges.Remove(edge);
+                        edge.To.edges.Remove(edge); 
                     }
                     else
                     {
-                        edge.From.edges.Remove(edge);
+                        edge.From.edges.Remove(edge); 
                     }
                 }
                 _nodes.Remove(node);
+                _infNodes.Remove(node);
             }
             else
             {
@@ -72,16 +76,16 @@ namespace SemesterAlgorithms
             }
         }
 
-        public void DeleteEdge(int from, int to) // O(n^2) 
+        public void DeleteEdge(int from, int to) 
         {
-            if (ContainsNode(from) && ContainsNode(to))
+            if (ContainsNode(from) && ContainsNode(to)) 
             {
-                if (ContainsEdge(from, to))
+                if (ContainsEdge(from, to)) 
                 {
-                    var nodeFrom = _nodes.Find(n => n.Number == from);
-                    var nodeTo = _nodes.Find(n => n.Number == to);
-                    nodeFrom.edges.Remove(new Edge(nodeFrom, nodeTo));
-                    nodeTo.edges.Remove(new Edge(nodeFrom, nodeTo));
+                    var nodeFrom = _nodes.Find(n => n.Number == from); 
+                    var nodeTo = _nodes.Find(n => n.Number == to); 
+                    nodeFrom.edges.Remove(new Edge(nodeFrom, nodeTo)); 
+                    nodeTo.edges.Remove(new Edge(nodeFrom, nodeTo)); 
                 }
                 else
                 {
@@ -94,20 +98,20 @@ namespace SemesterAlgorithms
             }
         }
 
-        public bool ContainsNode(int nodeNumber) // O(n)
+        public bool ContainsNode(int nodeNumber) 
         {
-            return _nodes.Contains(new Node(nodeNumber));
+            return _infNodes.Contains(new Node(nodeNumber));
         }
 
-        public bool ContainsEdge(int from, int to) // O(n)
+        public bool ContainsEdge(int from, int to) 
         {
-            if (ContainsNode(from) && ContainsNode(to))
+            if (ContainsNode(from) && ContainsNode(to)) 
             {
-                var nodeFrom = _nodes.Find(n => n.Number == from);
-                var nodeTo = _nodes.Find(n => n.Number == to);
+                var nodeFrom = _nodes.Find(n => n.Number == from); 
+                var nodeTo = _nodes.Find(n => n.Number == to); 
                 var edge = new Edge(nodeFrom, nodeTo);
 
-                return nodeFrom.edges.Contains(edge) && nodeTo.edges.Contains(edge);
+                return nodeFrom.edges.Contains(edge) && nodeTo.edges.Contains(edge); 
             }
 
             return false;
@@ -116,17 +120,15 @@ namespace SemesterAlgorithms
 
         public static Graph CreateRandomGraphWithEdges(int nodesCount, int edgesCount)
         {
+            if (edgesCount > nodesCount * (nodesCount - 1))
+            {
+                throw new ArgumentException("This number of edges is impossible in this graph!");
+            }
             var graph = new Graph();
             for (var i = 1; i <= nodesCount; i++)
             {
                 graph.AddNode(i);
             }
-
-            if (edgesCount > nodesCount * (nodesCount - 1))
-            {
-                throw new ArgumentException("This number of edges is impossible in this graph!");
-            }
-            
             var hashSet = new HashSet<(int, int)>();
             if (edgesCount != 0)
             {
@@ -164,63 +166,64 @@ namespace SemesterAlgorithms
             }
         }
 
-        public List<(int, int)> FindMaxMeetings()
+        public List<(int, int)> FindMaxMeetings() // O(n*m)
         {
-            var meetings = new List<(int, int)>();
-            var nodes = new List<int>();
-            var meets = FindMutualEdges();
-            var freq = CreateFrequencyNodes(meets)
-                      .OrderBy(x => x.Value)
-                      .ToList();
+            var meetings = new HashSet<(int, int)>();
+            var nodes = new HashSet<int>();
+            var meets = FindMutualEdges(); // O(m)
+            var freq = CreateFrequencyNodes(meets) // O(m)
+                      .OrderBy(x => x.Value) // O(n * logn)
+                      .ToList(); // O(n) => O(n * logn + m)
             
-            while (freq.Count != 0)
+            
+            while (freq.Count != 0) // O(n) => O(n*m)
             {
-                var meet = meets.Find(x => x.Item1 == freq[0].Key || x.Item2 == freq[0].Key);
-                if (!nodes.Contains(meet.Item1) && !nodes.Contains(meet.Item2) && meet.Item1 != meet.Item2)
+                var meet = meets.Find(x => x.Item1 == freq[0].Key || x.Item2 == freq[0].Key); // O(m)
+                if (!nodes.Contains(meet.Item1) && !nodes.Contains(meet.Item2) && meet.Item1 != meet.Item2) // O(1)
                 {
-                    meetings.Add(meet);
-                    nodes.Add(meet.Item1);
-                    nodes.Add(meet.Item2);
+                    meetings.Add(meet); // O(1)
+                    nodes.Add(meet.Item1); // O(1)
+                    nodes.Add(meet.Item2); // O(1)
                 }
-                freq.RemoveAt(0);
-                meets.Remove(meet);
+                freq.RemoveAt(0); // O(n)
+                meets.Remove(meet); // O(m)
             }
 
-            return meetings;
+            return meetings.ToList(); // O(m)
         }
 
-        private List<(int, int)> FindMutualEdges()
+        private List<(int, int)> FindMutualEdges() // Поиск "взаимных" рёбер - O(m)
         {
             var mutual = new HashSet<(int, int)>();
-            var edges = new HashSet<Edge>(_nodes.SelectMany(node => node.edges));
-            foreach (var edge in edges.Where(edge => edges.Contains(new Edge(edge.To, edge.From))))
+            var edges = new HashSet<Edge>(_nodes.SelectMany(node => node.edges)); // O(m)
+            foreach (var edge in edges.Where(edge => edges.Contains(new Edge(edge.To, edge.From)))) // O(m)
             {
-                mutual.Add((Math.Min(edge.From.Number, edge.To.Number), Math.Max(edge.From.Number, edge.To.Number)));
+                mutual.Add((Math.Min(edge.From.Number, edge.To.Number), Math.Max(edge.From.Number, edge.To.Number))); // O(1)
             }
-            return mutual.ToList();
+            return mutual.ToList(); // O(n)
         }
 
-        private Dictionary<int, int> CreateFrequencyNodes(List<(int, int)> meetings)
+        private Dictionary<int, int> CreateFrequencyNodes(List<(int, int)> meetings) // Создание частотного словаря по вершинам - O(m)
         {
             var dict = new Dictionary<int, int>();
-            foreach (var meeting in meetings)
+            foreach (var meeting in meetings) // O(m)
             {
-                if (!dict.ContainsKey(meeting.Item1))
+                if (!dict.ContainsKey(meeting.Item1)) // O(1)
                 {
-                    dict.Add(meeting.Item1, 1);
+                    dict.Add(meeting.Item1, 1); // O(1)
                 }
                 else
                 {
-                    dict[meeting.Item1]++;
+                    dict[meeting.Item1]++; // O(1)
                 }
 
                 if (!dict.ContainsKey(meeting.Item2))
                 {
-                    dict.Add(meeting.Item2, 1);
+                    dict.Add(meeting.Item2, 1); // O(1)
                 }
                 else
                 {
-                    dict[meeting.Item2]++;
+                    dict[meeting.Item2]++; // O(1)
                 }
             }
             return dict;
@@ -229,7 +232,6 @@ namespace SemesterAlgorithms
         public List<(int, int)> FindMaxMeetingsByBruteForce()
         {
             var allPaths = BruteForce(FindMutualEdges());
-            
             return FindBestSequence(allPaths); 
         }
 
